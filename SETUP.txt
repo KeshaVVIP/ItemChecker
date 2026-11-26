@@ -1,0 +1,72 @@
+ITEMBOUND • SHARED COLLECTION
+
+1. Back up current ticks
+   Open your old tracker and click Export progress. Keep the downloaded JSON.
+   The new cloud collection starts with the original 324 discoveries, only once.
+
+2. Firebase Realtime Database (not Firestore)
+   Firebase Console > Build > Realtime Database > Create Database.
+   Choose a region near you (Europe if offered) and start in locked mode.
+   Copy the exact database URL shown above the Data tab.
+   Stay on the Spark (free) plan. No paid server is necessary for ordinary use.
+
+3. Set up two accounts
+   Build > Authentication > Get started > Sign-in method > Email/Password > Enable > Save.
+   Use Email/Password, not Email link. Under Users, click Add user twice.
+   Make one account for each person with separate strong passwords. Do not put passwords in GitHub.
+   Copy the two User UIDs shown in the Users list.
+   Authentication > Settings > Authorized domains: add your GitHub Pages hostname
+   (for example YOURNAME.github.io, no https:// or repository path), if not already listed.
+
+4. Secure the database before opening the site
+   Open database.rules.json in a text editor, replace BOTH placeholders wherever they occur:
+   REPLACE_YOUR_UID and REPLACE_BOYFRIEND_UID with the actual User UIDs.
+   Firebase > Realtime Database > Rules: replace the default rules with this edited JSON.
+   Click Publish. Do not use test mode or public read/write rules.
+   Only those two Firebase UIDs can read or modify the collection. No public signup UI is provided.
+   This is a dedicated-project rule set: do not overwrite rules of an unrelated existing database.
+   Do not upload the rules file to GitHub; it is for the Firebase console.
+
+5. Configure the public website
+   Firebase > Project settings (gear) > General > Your apps > Add app > Web (</>).
+   If you already registered a Web app, use its SDK setup/config instead.
+   Register a name such as ItemBound; Firebase Hosting is not required.
+   Copy the object named firebaseConfig in the SDK configuration.
+   In firebase-config.js replace the entire placeholder object with that object, keeping
+   window.ITEMBOUND_FIREBASE_CONFIG = { ... };
+   Ensure databaseURL is present, using the exact URL from step 2 if missing.
+   You can commit this PUBLIC client config; never commit an Admin SDK/service account key,
+   private key, password, or other server credential. Security is enforced by the UID rules.
+
+6. Deploy to GitHub Pages
+   Upload index.html and the EDITED firebase-config.js into the same publishing folder
+   (usually the root of your main branch) in your existing repository. Replace an old index.html.
+   Repository > Settings > Pages > Build and deployment > Deploy from a branch > main > / (root).
+   If Pages already runs from another folder/branch, use that folder/branch instead.
+   Open the published HTTPS URL, not the local HTML file. Both players use the same URL.
+
+7. Sign in and test
+   First approved login initializes the database with the 324 original discoveries.
+   Sign in with your own email/password; your partner signs in with theirs.
+   Wait for "Live sync · Cloud saved". Tick an unfinished item; verify it updates on the other screen.
+   Untick it and check again. Refresh both pages to verify persistence.
+   If you have extra saved progress, import your old JSON or current command_storage.dat once.
+   Both imports MERGE discoveries (never remove existing ticks). The reset button intentionally
+   resets the whole shared collection for both users; it requires confirmation.
+   When disconnected, edits are blocked rather than silently diverging. If a save is pending,
+   keep the tab open until cloud confirmation. Recipes and icons use the existing online sources.
+   The original 324 ticks are embedded in the public HTML as a read-only preview; subsequent
+   cloud progress is protected by Firebase rules. A public Pages site is not itself private.
+
+Troubleshooting:
+   Setup needed: check firebase-config.js is in the same folder and has no REPLACE_ placeholders.
+   Access denied: check the two exact User UIDs (not emails) and publish rules in Realtime Database.
+   Sign-in failed: verify Email/Password is enabled, credentials and authorised domain are correct.
+   No live sync: check databaseURL, browser network and internet connection.
+   If you ever need to revoke access, remove that UID from Firebase database rules and publish.
+
+Official documentation:
+   https://firebase.google.com/docs/web/setup
+   https://firebase.google.com/docs/auth/web/password-auth
+   https://firebase.google.com/docs/database/web/read-and-write
+   https://firebase.google.com/docs/database/security
